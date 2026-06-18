@@ -21,38 +21,6 @@ This project demonstrates full CRUD operations with a modern UI using FlatLaf.
 
 ## 🏗 Project Structure
 
-
-
-Bilkul 👍 main tumhe **100% COPY-PASTE READY README.md** de raha hoon (no fixing needed, clean format, GitHub friendly).
-
----
-
-# 🚀 ✅ FINAL COPY-PASTE README.md
-
-```md
-# 🧠 Smart Course Registration & Student Management System (SCRNS)
-
-A Java Swing-based desktop application using **JDBC (SQLite), DAO Pattern, and MVC-inspired architecture**.  
-This project demonstrates full CRUD operations with a modern UI using FlatLaf.
-
----
-
-## 🚀 Features
-
-- ➕ Add Student (Register)
-- ✏ Update Student
-- ❌ Delete Student
-- 🔍 Search Student
-- 📋 View All Students
-- 🖱 Click Row → Auto Fill Form
-- 💾 SQLite Database Integration
-- 🎨 Modern Dark UI (FlatLaf)
-- 🏗 Layered Architecture (Model + DAO + Service + GUI)
-
----
-
-## 🏗 Project Structure
-
 ```
 
 com.scrns
