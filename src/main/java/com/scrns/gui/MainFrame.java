@@ -1,8 +1,7 @@
 package com.scrns.gui;
 
-import com.scrns.model.*;
-import com.scrns.notification.Notifiable;
-import com.scrns.persistence.DataManager;
+import com.scrns.model.Student;
+import com.scrns.service.StudentService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -10,133 +9,139 @@ import java.awt.*;
 
 public class MainFrame extends JFrame {
 
-    private JTextField txtId;
-    private JTextField txtName;
-
+    private JTextField txtId, txtName, txtSearch;
     private JTable table;
     private DefaultTableModel model;
 
-    private Course course;
+    private StudentService service;
 
-    public MainFrame(){
+    public MainFrame() {
 
-        setTitle("SCRNS");
-        setSize(700,500);
+        setTitle("SCRNS - Ultimate System");
+        setSize(1200, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        course = new Course("OOP",3);
+        service = new StudentService();
 
-        initGUI();
+        initUI();
+        loadTable();
 
         setVisible(true);
     }
 
-    private void initGUI(){
+    private void initUI() {
 
-        JPanel inputPanel = new JPanel(
-                new GridLayout(3,2,10,10));
+        // ================= INPUT PANEL =================
+        JPanel panel = new JPanel(new GridLayout(4, 3, 10, 10));
 
         txtId = new JTextField();
         txtName = new JTextField();
+        txtSearch = new JTextField();
 
-        JButton btnRegister =
-                new JButton("Register Student");
+        JButton btnAdd = new JButton("Add");
+        JButton btnUpdate = new JButton("Update");
+        JButton btnDelete = new JButton("Delete");
+        JButton btnSearch = new JButton("Search");
+        JButton btnLoad = new JButton("Load All");
 
-        JButton btnSave =
-                new JButton("Save");
+        panel.add(new JLabel("ID"));
+        panel.add(txtId);
+        panel.add(btnSearch);
 
-        JButton btnLoad =
-                new JButton("Load");
+        panel.add(new JLabel("Name"));
+        panel.add(txtName);
+        panel.add(btnAdd);
 
-        inputPanel.add(new JLabel("Student ID"));
-        inputPanel.add(txtId);
+        panel.add(btnUpdate);
+        panel.add(btnDelete);
+        panel.add(btnLoad);
 
-        inputPanel.add(new JLabel("Student Name"));
-        inputPanel.add(txtName);
-
-        inputPanel.add(btnRegister);
-        inputPanel.add(btnSave);
-
+        // ================= TABLE =================
         model = new DefaultTableModel();
-
         model.addColumn("ID");
         model.addColumn("Name");
 
         table = new JTable(model);
 
-        add(inputPanel,BorderLayout.NORTH);
-        add(new JScrollPane(table),
-                BorderLayout.CENTER);
+        add(panel, BorderLayout.NORTH);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
-        add(btnLoad,BorderLayout.SOUTH);
+        // ================= ROW CLICK =================
+        table.getSelectionModel().addListSelectionListener(e -> {
 
-        Notifiable notifier =
-                msg -> JOptionPane.showMessageDialog(
-                        this,msg);
+            int row = table.getSelectedRow();
 
-        btnRegister.addActionListener(e -> {
+            if (row != -1) {
+                txtId.setText(model.getValueAt(row, 0).toString());
+                txtName.setText(model.getValueAt(row, 1).toString());
+            }
+        });
 
-            try{
+        // ================= ADD =================
+        btnAdd.addActionListener(e -> {
 
-                Student student =
-                        new Student(
-                                txtId.getText(),
-                                txtName.getText());
+            Student s = new Student(txtId.getText(), txtName.getText());
 
-                course.registerStudent(student);
+            if (service.addStudent(s)) {
+                showMsg("Student Added");
+                loadTable();
+            } else {
+                showMsg("Fill all fields!");
+            }
+        });
+
+        // ================= UPDATE =================
+        btnUpdate.addActionListener(e -> {
+
+            service.updateStudent(new Student(txtId.getText(), txtName.getText()));
+
+            loadTable();
+            showMsg("Updated");
+        });
+
+        // ================= DELETE =================
+        btnDelete.addActionListener(e -> {
+
+            service.deleteStudent(txtId.getText());
+
+            loadTable();
+            showMsg("Deleted");
+        });
+
+        // ================= SEARCH =================
+        btnSearch.addActionListener(e -> {
+
+            model.setRowCount(0);
+
+            for (Student s : service.search(txtId.getText())) {
 
                 model.addRow(new Object[]{
-                        txtId.getText(),
-                        txtName.getText()
+                        s.getId(),
+                        s.getName()
                 });
-
-                notifier.notifyUser(
-                        "Registration Successful");
-
-            }
-            catch(CourseFullException ex){
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        ex.getMessage()
-                );
             }
         });
 
-        btnSave.addActionListener(e -> {
+        // ================= LOAD =================
+        btnLoad.addActionListener(e -> loadTable());
+    }
 
-            DataManager.saveCourse(course);
+    // ================= LOAD TABLE =================
+    private void loadTable() {
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Data Saved Successfully");
-        });
+        model.setRowCount(0);
 
-        btnLoad.addActionListener(e -> {
+        for (Student s : service.getAll()) {
 
-            Course loaded =
-                    DataManager.loadCourse();
+            model.addRow(new Object[]{
+                    s.getId(),
+                    s.getName()
+            });
+        }
+    }
 
-            if(loaded!=null){
-
-                course = loaded;
-
-                model.setRowCount(0);
-
-                for(Student s :
-                        course.getStudents()){
-
-                    model.addRow(new Object[]{
-                            s.getRole(),
-                            s.getName()
-                    });
-                }
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Data Loaded Successfully");
-            }
-        });
+    private void showMsg(String msg) {
+        JOptionPane.showMessageDialog(this, msg);
     }
 }
