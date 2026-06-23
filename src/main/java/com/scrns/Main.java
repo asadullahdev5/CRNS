@@ -13,6 +13,6 @@ public class Main {
         FlatDarkLaf.setup();
 
         // Launch GUI
-        SwingUtilities.invokeLater(MainFrame::new);
+        SwingUtilities.invokeLater( MainFrame::new);
     }
 }

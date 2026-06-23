@@ -87,6 +87,7 @@ public class StudentDAO {
     }
 
     // ================= UPDATE =================
+
     public void updateStudent(Student student) {
 
         String sql = "UPDATE students SET name = ? WHERE id = ?";
@@ -96,16 +97,20 @@ public class StudentDAO {
                 PreparedStatement ps = con.prepareStatement(sql)
         ) {
 
+            System.out.println("ID: " + student.getId());
+            System.out.println("Name: " + student.getName());
+
             ps.setString(1, student.getName());
             ps.setString(2, student.getId());
 
-            ps.executeUpdate();
+            int rows = ps.executeUpdate();
+
+            System.out.println("Rows Updated = " + rows);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-
     // ================= DELETE =================
     public void deleteStudent(String id) {
 
